@@ -1,4 +1,5 @@
 import { UserButton } from "@clerk/nextjs";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 export default function DashboardPage() {
   return (
@@ -11,6 +12,7 @@ export default function DashboardPage() {
         <div className="flex items-center gap-6">
           <a href="/" className="text-xs font-bold uppercase tracking-widest text-muted hover:text-foreground transition-colors">Back to Home</a>
           <UserButton afterSignOutUrl="/" />
+          <ThemeToggle />
         </div>
       </header>
 
