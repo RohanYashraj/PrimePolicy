@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { SignInButton, SignUpButton, SignedIn, SignedOut, UserButton } from "@clerk/nextjs";
 
 export default function Home() {
   return (
@@ -12,14 +13,24 @@ export default function Home() {
           <div className="h-6 w-6 bg-accent" />
           <span className="text-xl font-bold tracking-tighter uppercase">PrimePolicy</span>
         </div>
-        <nav className="hidden items-center gap-8 text-sm font-medium uppercase tracking-widest text-muted sm:flex">
-          <a href="#" className="transition-colors hover:text-foreground">System</a>
-          <a href="#" className="transition-colors hover:text-foreground">Agents</a>
-          <a href="#" className="transition-colors hover:text-foreground">Documentation</a>
-        </nav>
-        <button className="rounded-none border border-foreground/10 bg-foreground/5 px-6 py-2 text-xs font-bold uppercase tracking-widest transition-all hover:bg-foreground hover:text-background">
-          Enter POC
-        </button>
+        <div className="flex items-center gap-6">
+          <SignedOut>
+            <div className="hidden items-center gap-8 text-sm font-medium uppercase tracking-widest text-muted sm:flex">
+              <SignInButton mode="modal">
+                <button className="transition-colors hover:text-foreground">Sign In</button>
+              </SignInButton>
+            </div>
+            <SignUpButton mode="modal">
+              <button className="rounded-none border border-foreground/10 bg-foreground/5 px-6 py-2 text-xs font-bold uppercase tracking-widest transition-all hover:bg-foreground hover:text-background">
+                Get Started
+              </button>
+            </SignUpButton>
+          </SignedOut>
+          <SignedIn>
+            <a href="/dashboard" className="text-sm font-medium uppercase tracking-widest text-muted transition-colors hover:text-foreground">Dashboard</a>
+            <UserButton afterSignOutUrl="/" />
+          </SignedIn>
+        </div>
       </header>
 
       <main className="relative z-10 mx-auto max-w-7xl px-6 pt-24 pb-32">
