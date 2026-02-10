@@ -16,15 +16,11 @@ export default function Home() {
         <div className="flex items-center gap-6">
           <SignedOut>
             <div className="hidden items-center gap-8 text-sm font-medium uppercase tracking-widest text-muted sm:flex">
-              <SignInButton mode="modal">
-                <button className="transition-colors hover:text-foreground">Sign In</button>
-              </SignInButton>
+              <a href="/sign-in" className="transition-colors hover:text-foreground">Sign In</a>
             </div>
-            <SignUpButton mode="modal">
-              <button className="rounded-none border border-foreground/10 bg-foreground/5 px-6 py-2 text-xs font-bold uppercase tracking-widest transition-all hover:bg-foreground hover:text-background">
-                Get Started
-              </button>
-            </SignUpButton>
+            <a href="/sign-up" className="rounded-none border border-foreground/10 bg-foreground/5 px-6 py-2 text-xs font-bold uppercase tracking-widest transition-all hover:bg-foreground hover:text-background">
+              Get Started
+            </a>
           </SignedOut>
           <SignedIn>
             <a href="/dashboard" className="text-sm font-medium uppercase tracking-widest text-muted transition-colors hover:text-foreground">Dashboard</a>
