@@ -1,8 +1,12 @@
 "use client";
 
-import { usePathname, useRouter } from "next/navigation";
-import { ChevronLeft, ChevronRight, ShieldCheck } from "lucide-react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { ChevronLeft, ChevronRight, ShieldCheck, Save } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useMutation } from "convex/react";
+import { api } from "@/convex/_generated/api";
+
+import { PolicyCreationProvider, usePolicyCreation } from "@/context/PolicyCreationContext";
 
 const steps = [
   { id: 1, name: "Intake", path: "step-1-intake", label: "Application Intake" },
@@ -13,23 +17,50 @@ const steps = [
   { id: 6, name: "Issuance", path: "step-6-issuance", label: "Policy Issuance" },
 ];
 
-export default function StepLayout({ children }: { children: React.ReactNode }) {
+function StepLayoutContent({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const policyId = searchParams.get("id");
+  const { saveStep, isSaving, setIsSaving } = usePolicyCreation();
 
   // Find current step index
   const currentStepIndex = steps.findIndex(step => pathname.includes(step.path));
   const currentStep = steps[currentStepIndex] || steps[0];
 
-  const handleNext = () => {
+  const handleNext = async () => {
+    if (saveStep) {
+      setIsSaving(true);
+      try {
+        await saveStep();
+      } catch (err) {
+        console.error("Failed to save step:", err);
+        setIsSaving(false);
+        return;
+      }
+      setIsSaving(false);
+    }
+
     if (currentStepIndex < steps.length - 1) {
-      router.push(`/dashboard/create-policy/${steps[currentStepIndex + 1].path}`);
+      const nextPath = `/dashboard/create-policy/${steps[currentStepIndex + 1].path}`;
+      const url = policyId ? `${nextPath}?id=${policyId}` : nextPath;
+      router.push(url);
     }
   };
 
   const handleBack = () => {
     if (currentStepIndex > 0) {
-      router.push(`/dashboard/create-policy/${steps[currentStepIndex - 1].path}`);
+      const prevPath = `/dashboard/create-policy/${steps[currentStepIndex - 1].path}`;
+      const url = policyId ? `${prevPath}?id=${policyId}` : prevPath;
+      router.push(url);
+    }
+  };
+
+  const handleSaveDraft = async () => {
+    if (saveStep) {
+      setIsSaving(true);
+      await saveStep();
+      setIsSaving(false);
     }
   };
 
@@ -41,7 +72,7 @@ export default function StepLayout({ children }: { children: React.ReactNode }) 
           <div>
             <h2 className="text-3xl font-bold tracking-tighter uppercase mb-2">Create New Policy</h2>
             <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-muted">
-              Sovereign Underwriting Protocol: <span className="text-accent">{currentStep.label}</span>
+              Underwriting System: <span className="text-accent">{currentStep.label}</span>
             </p>
           </div>
           <div className="text-right hidden sm:block">
@@ -89,16 +120,23 @@ export default function StepLayout({ children }: { children: React.ReactNode }) 
         <div className="absolute inset-0 -z-10 bg-[radial-gradient(var(--border)_1px,transparent_1px)] [background-size:20px_20px] opacity-20" />
         
         {children}
+        
+        {isSaving && (
+        <div className="fixed bottom-12 right-12 z-50 flex items-center gap-4 bg-background border border-accent p-4 shadow-2xl animate-in slide-in-from-bottom-8">
+          <div className="h-2 w-2 rounded-full bg-accent animate-pulse" />
+          <span className="text-[10px] font-bold uppercase tracking-[0.2em] italic">Synchronizing Policy Data...</span>
+        </div>
+      )}
       </div>
 
       {/* Navigation Footer */}
       <div className="flex justify-between items-center pt-8 border-t border-border mt-12">
         <button
           onClick={handleBack}
-          disabled={currentStepIndex === 0}
+          disabled={currentStepIndex === 0 || isSaving}
           className={cn(
             "group flex h-12 items-center gap-3 px-6 text-[10px] font-bold uppercase tracking-[0.2em] transition-all border border-border",
-            currentStepIndex === 0 ? "opacity-30 cursor-not-allowed" : "hover:bg-foreground/5 hover:border-foreground/20"
+            (currentStepIndex === 0 || isSaving) ? "opacity-30 cursor-not-allowed" : "hover:bg-foreground/5 hover:border-foreground/20"
           )}
         >
           <ChevronLeft className="h-4 w-4 transition-transform group-hover:-translate-x-1" />
@@ -106,10 +144,24 @@ export default function StepLayout({ children }: { children: React.ReactNode }) 
         </button>
 
         <button
+          onClick={handleSaveDraft}
+          disabled={!policyId || isSaving}
+          className={cn(
+            "group flex h-12 items-center gap-3 px-6 text-[10px] font-bold uppercase tracking-[0.2em] transition-all border border-border",
+            (!policyId || isSaving) ? "opacity-30 cursor-not-allowed" : "hover:bg-foreground/5 hover:border-foreground/20"
+          )}
+        >
+          <Save className="h-4 w-4" />
+          {isSaving ? "Saving..." : "Save Draft"}
+        </button>
+
+        <button
           onClick={handleNext}
+          disabled={isSaving}
           className={cn(
             "group flex h-12 items-center gap-4 bg-foreground px-10 text-[10px] font-bold uppercase tracking-[0.2em] text-background transition-all hover:bg-foreground/90 active:scale-95",
-            currentStepIndex === steps.length - 1 && "bg-accent hover:bg-accent/90"
+            currentStepIndex === steps.length - 1 && "bg-accent hover:bg-accent/90",
+            isSaving && "opacity-50 cursor-not-allowed"
           )}
         >
           {currentStepIndex === steps.length - 1 ? (
@@ -119,12 +171,20 @@ export default function StepLayout({ children }: { children: React.ReactNode }) 
             </>
           ) : (
             <>
-              Continue
+              {isSaving ? "Processing..." : "Continue"}
               <ChevronRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
             </>
           )}
         </button>
       </div>
     </div>
+  );
+}
+
+export default function StepLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <PolicyCreationProvider>
+      <StepLayoutContent>{children}</StepLayoutContent>
+    </PolicyCreationProvider>
   );
 }

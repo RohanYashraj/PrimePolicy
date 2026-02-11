@@ -19,6 +19,7 @@ const outfit = Outfit({
 
 import { ThemeProvider } from "@/components/theme-provider";
 import { ClerkThemeProvider } from "@/components/clerk-theme-provider";
+import { ConvexClientProvider } from "@/components/ConvexClientProvider";
 
 export const metadata: Metadata = {
   title: "PrimePolicy | Agentic Policy Admin",
@@ -42,7 +43,9 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <ClerkThemeProvider>
-            {children}
+            <ConvexClientProvider>
+              {children}
+            </ConvexClientProvider>
           </ClerkThemeProvider>
         </ThemeProvider>
       </body>
