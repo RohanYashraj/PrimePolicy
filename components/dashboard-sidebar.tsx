@@ -1,10 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { LayoutDashboard, ReceiptText, BarChart3, Plus, ShieldCheck } from "lucide-react";
 import { UserButton, useUser } from "@clerk/nextjs";
 import { cn } from "@/lib/utils";
+import { useMutation } from "convex/react";
+import { api } from "@/convex/_generated/api";
 
 const navigation = [
   { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
@@ -15,6 +17,18 @@ const navigation = [
 export function DashboardSidebar() {
   const pathname = usePathname();
   const { user } = useUser();
+  const router = useRouter();
+  const initializePolicy = useMutation(api.policies.initializePolicy);
+
+  const handleCreateNew = async () => {
+    if (!user) return;
+    try {
+      const id = await initializePolicy({ createdBy: user.id });
+      router.push(`/dashboard/create-policy/step-1-intake?id=${id}`);
+    } catch (error) {
+      console.error("Failed to initialize policy:", error);
+    }
+  };
 
   return (
     <aside className="fixed left-0 top-0 z-40 h-screen w-72 border-r border-border bg-background/50 backdrop-blur-xl">
@@ -28,15 +42,15 @@ export function DashboardSidebar() {
         </Link>
 
         {/* Action */}
-        <Link 
-          href="/dashboard/create-policy"
-          className="group mb-12 flex h-14 items-center justify-center gap-3 bg-foreground p-1 text-sm font-bold uppercase tracking-[0.2em] text-background transition-all hover:bg-foreground/90 active:scale-95"
+        <button 
+          onClick={handleCreateNew}
+          className="group mb-12 flex h-14 items-center justify-start gap-3 bg-foreground p-1 text-sm font-bold uppercase tracking-[0.2em] text-background transition-all hover:bg-foreground/90 active:scale-95 w-full"
         >
-          <div className="flex items-center gap-2 border border-background/20 px-4 py-2 w-full h-full justify-center">
+          <div className="flex items-center gap-2 border border-background/20 px-4 py-2 w-full h-full justify-start whitespace-nowrap">
             <Plus className="h-4 w-4" />
-            Create New Policy
+            Issue new policy
           </div>
-        </Link>
+        </button>
 
         {/* Navigation */}
         <nav className="flex-1 space-y-2">
@@ -64,14 +78,15 @@ export function DashboardSidebar() {
         </nav>
 
         {/* Footer */}
-        <div className="mt-auto border-t border-border pt-6 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-             <div className="relative h-10 w-10 overflow-hidden ring-1 ring-border">
+        <div className="mt-auto border-t border-border pt-6 flex items-center justify-start">
+          <div className="flex items-center gap-2">
+             <div className="relative flex h-10 w-10 items-center justify-center">
                 <UserButton 
                   appearance={{
                     elements: {
                       userButtonAvatarContainer: "rounded-none",
-                      userButtonTrigger: "rounded-none h-10 w-10",
+                      userButtonTrigger: "rounded-none h-10 w-10 flex items-center justify-center",
+                      userButtonAvatarBox: "h-10 w-10"
                     }
                   }}
                   afterSignOutUrl="/" 

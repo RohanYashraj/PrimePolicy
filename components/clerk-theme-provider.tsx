@@ -6,12 +6,14 @@ import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
 
 export function ClerkThemeProvider({ children }: { children: React.ReactNode }) {
-  const { theme, resolvedTheme } = useTheme();
+  const { resolvedTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    setMounted(true);
-  }, []);
+    if (!mounted) {
+      setMounted(true);
+    }
+  }, [mounted]);
 
   // Use resolvedTheme to handle "system" mode as well
   const currentTheme = mounted ? (resolvedTheme === "dark" ? dark : undefined) : undefined;
