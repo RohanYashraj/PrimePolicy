@@ -1,5 +1,6 @@
 "use client";
 
+import React, { Suspense } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { ChevronLeft, ChevronRight, ShieldCheck, Save } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -184,7 +185,14 @@ function StepLayoutContent({ children }: { children: React.ReactNode }) {
 export default function StepLayout({ children }: { children: React.ReactNode }) {
   return (
     <PolicyCreationProvider>
-      <StepLayoutContent>{children}</StepLayoutContent>
+      <Suspense fallback={
+        <div className="max-w-5xl mx-auto p-12 text-center">
+          <div className="h-1 w-24 bg-accent animate-pulse mx-auto mb-4" />
+          <span className="text-[10px] font-bold uppercase tracking-[0.2em] italic">Initialising Stepper Interface...</span>
+        </div>
+      }>
+        <StepLayoutContent>{children}</StepLayoutContent>
+      </Suspense>
     </PolicyCreationProvider>
   );
 }
