@@ -7,13 +7,14 @@ import { useSearchParams } from "next/navigation";
 import { FileUploader } from "@/components/FileUploader";
 import { cn } from "@/lib/utils";
 import { usePolicyCreation } from "@/context/PolicyCreationContext";
+import { Id } from "@/convex/_generated/dataModel";
 
 export default function DocumentsPage() {
   const searchParams = useSearchParams();
-  const policyId = searchParams.get("id");
+  const policyId = searchParams.get("id") as Id<"policies"> | null;
   
   const existingPolicy = useQuery(api.policies.getPolicy, 
-    policyId ? { id: policyId as any } : "skip"
+    policyId ? { id: policyId } : "skip"
   );
   
   const updatePolicy = useMutation(api.policies.updatePolicy);
@@ -34,7 +35,7 @@ export default function DocumentsPage() {
   const saveCurrentStep = useCallback(async () => {
     if (policyId) {
       await updatePolicy({
-        id: policyId as any,
+        id: policyId,
         updates: idData
       });
     }
@@ -45,8 +46,10 @@ export default function DocumentsPage() {
     return () => setStepSaveFunction(null);
   }, [saveCurrentStep, setStepSaveFunction]);
 
+  const [hasInitialized, setHasInitialized] = useState(false);
+
   useEffect(() => {
-    if (existingPolicy) {
+    if (existingPolicy && !hasInitialized) {
        setDocProgress({
          identity: (existingPolicy.documentIds?.length || 0) > 0,
          financial: (existingPolicy.documentIds?.length || 0) > 1,
@@ -56,8 +59,9 @@ export default function DocumentsPage() {
          aadharNumber: existingPolicy.aadharNumber || "",
          panNumber: existingPolicy.panNumber || "",
        });
+       setHasInitialized(true);
     }
-  }, [existingPolicy]);
+  }, [existingPolicy, hasInitialized]);
 
   const handleUpload = (type: keyof typeof docProgress) => {
     setDocProgress(prev => ({ ...prev, [type]: true }));

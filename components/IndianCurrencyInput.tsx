@@ -25,8 +25,10 @@ export function IndianCurrencyInput({
 
   useEffect(() => {
     if (value === 0 && !displayValue) return;
-    setDisplayValue(value.toString());
-  }, [value]);
+    if (value.toString() !== displayValue) {
+      setDisplayValue(value.toString());
+    }
+  }, [value, displayValue]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const val = e.target.value.replace(/[^0-9]/g, "");

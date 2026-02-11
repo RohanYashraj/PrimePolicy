@@ -6,10 +6,10 @@ import { api } from "@/convex/_generated/api";
 import { formatINR } from "@/lib/currency-utils";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { useUser } from "@clerk/nextjs";
-import { FileText, Edit3, Trash2, Clock, CheckCircle, ShieldAlert, Ban, Plus } from "lucide-react";
+import { FileText, Edit3, Trash2, Clock, CheckCircle, ShieldAlert, Ban } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { Id, Doc } from "@/convex/_generated/dataModel";
 
 export default function PolicyQueuePage() {
   const { user } = useUser();
@@ -30,7 +30,7 @@ export default function PolicyQueuePage() {
     }
   };
 
-  const handleDelete = async (id: any) => {
+  const handleDelete = async (id: Id<"policies">) => {
     try {
       await deletePolicy({ id });
     } catch (err) {
@@ -98,7 +98,15 @@ export default function PolicyQueuePage() {
   );
 }
 
-function PolicyCard({ policy, onDelete, statusConfig }: { policy: any; onDelete: (id: any) => void; statusConfig: any }) {
+function PolicyCard({ 
+  policy, 
+  onDelete, 
+  statusConfig 
+}: { 
+  policy: Doc<"policies">; 
+  onDelete: (id: Id<"policies">) => void; 
+  statusConfig: { icon: any; color: string; border: string; bg: string; label: string };
+}) {
   const [showConfirm, setShowConfirm] = useState(false);
   
   return (
@@ -120,7 +128,7 @@ function PolicyCard({ policy, onDelete, statusConfig }: { policy: any; onDelete:
             <span className="h-1.5 w-1.5 rounded-full bg-accent" />
             <p className="text-[8px] font-bold text-accent uppercase tracking-[0.2em]">Policy ID</p>
           </div>
-          <h3 className="text-2xl font-mono font-bold tracking-tighter leading-none italic">{policy.policyId || policy.protocolId || "PENDING"}</h3>
+          <h3 className="text-2xl font-mono font-bold tracking-tighter leading-none italic">{policy.policyId || "PENDING"}</h3>
         </div>
         <div className={cn(
           "px-3 py-1.5 text-[8px] font-bold uppercase tracking-[0.2em] border",

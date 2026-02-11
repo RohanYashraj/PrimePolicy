@@ -1,6 +1,6 @@
 "use client";
 
-import { UserButton, useUser } from "@clerk/nextjs";
+import { useUser } from "@clerk/nextjs";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { usePathname } from "next/navigation";
 

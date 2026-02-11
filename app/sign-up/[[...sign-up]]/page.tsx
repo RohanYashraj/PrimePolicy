@@ -1,4 +1,5 @@
 import { SignUp } from "@clerk/nextjs";
+import Link from "next/link";
 
 export default function SignUpPage() {
   return (
@@ -17,7 +18,7 @@ export default function SignUpPage() {
         <SignUp />
         
         <div className="mt-12 text-center">
-          <a href="/" className="text-xs font-bold uppercase tracking-widest text-muted hover:text-foreground transition-colors">Return to Terminal</a>
+          <Link href="/" className="text-xs font-bold uppercase tracking-widest text-muted hover:text-foreground transition-colors">Return to Terminal</Link>
         </div>
       </div>
 

@@ -7,14 +7,15 @@ import { useState, useEffect, useCallback } from "react";
 import { cn } from "@/lib/utils";
 import { Activity, ShieldAlert, HeartPulse } from "lucide-react";
 import { usePolicyCreation } from "@/context/PolicyCreationContext";
+import { Id } from "@/convex/_generated/dataModel";
 
 export default function RiskPage() {
   const searchParams = useSearchParams();
-  const policyId = searchParams.get("id");
+  const policyId = searchParams.get("id") as Id<"policies"> | null;
   const { setStepSaveFunction } = usePolicyCreation();
   
   const existingPolicy = useQuery(api.policies.getPolicy, 
-    policyId ? { id: policyId as any } : "skip"
+    policyId ? { id: policyId } : "skip"
   );
   
   const updatePolicy = useMutation(api.policies.updatePolicy);
@@ -28,7 +29,7 @@ export default function RiskPage() {
   const saveCurrentStep = useCallback(async () => {
     if (policyId) {
       await updatePolicy({
-        id: policyId as any,
+        id: policyId,
         updates: riskData
       });
     }
@@ -39,15 +40,18 @@ export default function RiskPage() {
     return () => setStepSaveFunction(null);
   }, [saveCurrentStep, setStepSaveFunction]);
 
+  const [hasInitialized, setHasInitialized] = useState(false);
+
   useEffect(() => {
-    if (existingPolicy) {
+    if (existingPolicy && !hasInitialized) {
       setRiskData({
-        smokingStatus: (existingPolicy.smokingStatus as any) || "non-smoker",
+        smokingStatus: (existingPolicy.smokingStatus as "smoker" | "non-smoker") || "non-smoker",
         medicalHistory: existingPolicy.medicalHistory || [],
         lifestyleRisk: existingPolicy.lifestyleRisk || "low",
       });
+      setHasInitialized(true);
     }
-  }, [existingPolicy]);
+  }, [existingPolicy, hasInitialized]);
 
   const toggleCondition = (condition: string) => {
     setRiskData(prev => ({

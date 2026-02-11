@@ -5,13 +5,14 @@ import { api } from "@/convex/_generated/api";
 import { useSearchParams } from "next/navigation";
 import { CheckCircle2, ShieldCheck, Printer, Download, Mail } from "lucide-react";
 import { formatINR } from "@/lib/currency-utils";
+import { Id } from "@/convex/_generated/dataModel";
 
 export default function IssuancePage() {
   const searchParams = useSearchParams();
-  const policyId = searchParams.get("id");
+  const policyId = searchParams.get("id") as Id<"policies"> | null;
   
   const existingPolicy = useQuery(api.policies.getPolicy, 
-    policyId ? { id: policyId as any } : "skip"
+    policyId ? { id: policyId } : "skip"
   );
   return (
     <div className="h-full flex flex-col items-center justify-center space-y-12 py-12">

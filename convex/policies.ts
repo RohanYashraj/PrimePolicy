@@ -110,7 +110,7 @@ export const listPolicies = query({
         if (args.status) {
             return await ctx.db
                 .query("policies")
-                .withIndex("by_status", (q) => q.eq("status", args.status as any))
+                .withIndex("by_status", (q) => q.eq("status", args.status as "quote" | "under_review" | "approved" | "issued" | "cancelled"))
                 .order("desc")
                 .collect();
         }

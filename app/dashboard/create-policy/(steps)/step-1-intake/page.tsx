@@ -3,23 +3,20 @@
 import { useMutation, useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { useState, useEffect, useCallback } from "react";
-import { useUser } from "@clerk/nextjs";
-import { useSearchParams, useRouter } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { IndianCurrencyInput } from "@/components/IndianCurrencyInput";
 import { cn } from "@/lib/utils";
 import { usePolicyCreation } from "@/context/PolicyCreationContext";
+import { Id } from "@/convex/_generated/dataModel";
 
 export default function IntakePage() {
-  const { user } = useUser();
-  const router = useRouter();
   const searchParams = useSearchParams();
-  const policyId = searchParams.get("id");
+  const policyId = searchParams.get("id") as Id<"policies"> | null;
   
   const existingPolicy = useQuery(api.policies.getPolicy, 
-    policyId ? { id: policyId as any } : "skip"
+    policyId ? { id: policyId } : "skip"
   );
   
-  const createPolicy = useMutation(api.policies.createPolicy);
   const updatePolicy = useMutation(api.policies.updatePolicy);
   
   const [formData, setFormData] = useState({
@@ -36,7 +33,7 @@ export default function IntakePage() {
   const saveCurrentStep = useCallback(async () => {
     if (policyId) {
       await updatePolicy({
-        id: policyId as any,
+        id: policyId,
         updates: formData
       });
     }
@@ -47,18 +44,21 @@ export default function IntakePage() {
     return () => setStepSaveFunction(null);
   }, [saveCurrentStep, setStepSaveFunction]);
 
+  const [hasInitialized, setHasInitialized] = useState(false);
+
   useEffect(() => {
-    if (existingPolicy) {
+    if (existingPolicy && !hasInitialized) {
       setFormData({
         clientName: existingPolicy.clientName || "",
         clientEmail: existingPolicy.clientEmail || "",
         dob: existingPolicy.dob || "",
-        gender: (existingPolicy.gender as any) || "male",
+        gender: (existingPolicy.gender as "male" | "female" | "other") || "male",
         occupation: existingPolicy.occupation || "",
         annualIncome: existingPolicy.annualIncome || 0,
       });
+      setHasInitialized(true);
     }
-  }, [existingPolicy]);
+  }, [existingPolicy, hasInitialized]);
 
   return (
     <div className="space-y-12">
@@ -113,7 +113,7 @@ export default function IntakePage() {
               <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted">Gender</label>
               <select
                 value={formData.gender}
-                onChange={(e) => setFormData({ ...formData, gender: e.target.value as any })}
+                onChange={(e) => setFormData({ ...formData, gender: e.target.value as "male" | "female" | "other" })}
                 className="w-full bg-transparent border border-border/60 p-3 text-xs font-mono focus:border-accent outline-none transition-colors"
               >
                 <option value="male" className="bg-background">Male</option>

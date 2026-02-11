@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { Upload, X, FileText, CheckCircle2 } from "lucide-react";
-import { cn } from "@/lib/utils";
 
 interface FileUploaderProps {
   label: string;

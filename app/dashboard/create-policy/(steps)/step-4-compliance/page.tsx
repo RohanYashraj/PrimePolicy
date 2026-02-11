@@ -7,14 +7,15 @@ import { useState, useEffect, useCallback } from "react";
 import { ShieldCheck, UserPlus, Fingerprint } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { usePolicyCreation } from "@/context/PolicyCreationContext";
+import { Id } from "@/convex/_generated/dataModel";
 
 export default function CompliancePage() {
   const searchParams = useSearchParams();
-  const policyId = searchParams.get("id");
+  const policyId = searchParams.get("id") as Id<"policies"> | null;
   const { setStepSaveFunction } = usePolicyCreation();
   
   const existingPolicy = useQuery(api.policies.getPolicy, 
-    policyId ? { id: policyId as any } : "skip"
+    policyId ? { id: policyId } : "skip"
   );
   
   const updatePolicy = useMutation(api.policies.updatePolicy);
@@ -30,7 +31,7 @@ export default function CompliancePage() {
   const saveCurrentStep = useCallback(async () => {
     if (policyId) {
       await updatePolicy({
-        id: policyId as any,
+        id: policyId,
         updates: {
           nomineeName: kycData.nomineeName,
           nomineeRelation: kycData.nomineeRelation,
@@ -45,8 +46,10 @@ export default function CompliancePage() {
     return () => setStepSaveFunction(null);
   }, [saveCurrentStep, setStepSaveFunction]);
 
+  const [hasInitialized, setHasInitialized] = useState(false);
+
   useEffect(() => {
-    if (existingPolicy) {
+    if (existingPolicy && !hasInitialized) {
       setKycData({
         nomineeName: existingPolicy.nomineeName || "",
         nomineeRelation: existingPolicy.nomineeRelation || "",
@@ -54,8 +57,9 @@ export default function CompliancePage() {
         kycMethod: "Video KYC",
         declarationsAccepted: existingPolicy.kycStatus === "verified",
       });
+      setHasInitialized(true);
     }
-  }, [existingPolicy]);
+  }, [existingPolicy, hasInitialized]);
 
   return (
     <div className="space-y-12">

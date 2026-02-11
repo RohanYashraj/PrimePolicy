@@ -9,14 +9,15 @@ import { formatINR, formatINRShort } from "@/lib/currency-utils";
 import { cn } from "@/lib/utils";
 import { Calculator, Zap, Gavel } from "lucide-react";
 import { usePolicyCreation } from "@/context/PolicyCreationContext";
+import { Id } from "@/convex/_generated/dataModel";
 
 export default function PricingPage() {
   const searchParams = useSearchParams();
-  const policyId = searchParams.get("id");
+  const policyId = searchParams.get("id") as Id<"policies"> | null;
   const { setStepSaveFunction } = usePolicyCreation();
   
   const existingPolicy = useQuery(api.policies.getPolicy, 
-    policyId ? { id: policyId as any } : "skip"
+    policyId ? { id: policyId } : "skip"
   );
   
   const updatePolicy = useMutation(api.policies.updatePolicy);
@@ -33,7 +34,7 @@ export default function PricingPage() {
   const saveCurrentStep = useCallback(async () => {
     if (policyId) {
       await updatePolicy({
-        id: policyId as any,
+        id: policyId,
         updates: {
           sumAssured,
           premiumAmount: calculatedPremium,
@@ -47,11 +48,14 @@ export default function PricingPage() {
     return () => setStepSaveFunction(null);
   }, [saveCurrentStep, setStepSaveFunction]);
 
+  const [hasInitialized, setHasInitialized] = useState(false);
+
   useEffect(() => {
-    if (existingPolicy) {
+    if (existingPolicy && !hasInitialized) {
       setSumAssured(existingPolicy.sumAssured || 5000000);
+      setHasInitialized(true);
     }
-  }, [existingPolicy]);
+  }, [existingPolicy, hasInitialized]);
 
   return (
     <div className="space-y-12">
@@ -85,7 +89,7 @@ export default function PricingPage() {
                 {["monthly", "annually"].map((type) => (
                   <button
                     key={type}
-                    onClick={() => setPremiumType(type as any)}
+                    onClick={() => setPremiumType(type as "monthly" | "annually")}
                     className={cn(
                       "flex-1 p-3 border text-[10px] font-mono uppercase tracking-widest transition-all",
                       premiumType === type ? "border-accent bg-accent/5" : "border-border/40"

@@ -4,8 +4,6 @@ import React, { Suspense } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { ChevronLeft, ChevronRight, ShieldCheck, Save } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { useMutation } from "convex/react";
-import { api } from "@/convex/_generated/api";
 
 import { PolicyCreationProvider, usePolicyCreation } from "@/context/PolicyCreationContext";
 
