@@ -1,5 +1,11 @@
 import { SignInButton, SignUpButton, SignedIn, SignedOut, UserButton } from "@clerk/nextjs";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Reimagining Insurance with Agentic Intelligence",
+  description: "Experience the industrial-grade Policy Admin System (PAS) powered by autonomous agents. Precision underwriting, sovereign claims, and dynamic product engines.",
+};
 
 export default function Home() {
   return (

@@ -78,14 +78,15 @@ export function DashboardSidebar() {
         </nav>
 
         {/* Footer */}
-        <div className="mt-auto border-t border-border pt-6 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-             <div className="relative h-10 w-10 overflow-hidden ring-1 ring-border">
+        <div className="mt-auto border-t border-border pt-6 flex items-center justify-start">
+          <div className="flex items-center gap-2">
+             <div className="relative flex h-10 w-10 items-center justify-center">
                 <UserButton 
                   appearance={{
                     elements: {
                       userButtonAvatarContainer: "rounded-none",
-                      userButtonTrigger: "rounded-none h-10 w-10",
+                      userButtonTrigger: "rounded-none h-10 w-10 flex items-center justify-center",
+                      userButtonAvatarBox: "h-10 w-10"
                     }
                   }}
                   afterSignOutUrl="/" 
