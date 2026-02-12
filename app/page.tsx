@@ -54,16 +54,16 @@ export default function Home() {
           </p>
 
           <div className="mt-16 flex flex-wrap gap-6">
-            <button className="group flex h-14 items-center gap-4 bg-accent px-8 text-sm font-bold uppercase tracking-[0.2em] transition-all hover:scale-[1.02] hover:bg-accent/90">
+            <Link href="/dashboard" className="group flex h-14 items-center gap-4 bg-accent px-8 text-sm font-bold uppercase tracking-[0.2em] transition-all hover:scale-[1.02] hover:bg-accent/90">
               Launch Prototype
               <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg" className="transition-transform group-hover:translate-x-1">
                 <path d="M3.75 9H14.25" stroke="currentColor" strokeWidth="2" strokeLinecap="square" strokeLinejoin="round"/>
                 <path d="M9.75 4.5L14.25 9L9.75 13.5" stroke="currentColor" strokeWidth="2" strokeLinecap="square" strokeLinejoin="round"/>
               </svg>
-            </button>
-            <button className="flex h-14 items-center gap-4 border border-foreground/20 bg-transparent px-8 text-sm font-bold uppercase tracking-[0.2em] transition-all hover:bg-foreground/5">
+            </Link>
+            <Link href="/architecture" className="flex h-14 items-center gap-4 border border-foreground/20 bg-transparent px-8 text-sm font-bold uppercase tracking-[0.2em] transition-all hover:bg-foreground/5">
               View Architecture
-            </button>
+            </Link>
           </div>
         </section>
 
