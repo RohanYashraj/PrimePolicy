@@ -20,6 +20,7 @@ const outfit = Outfit({
 import { ThemeProvider } from "@/components/theme-provider";
 import { ClerkThemeProvider } from "@/components/clerk-theme-provider";
 import { ConvexClientProvider } from "@/components/ConvexClientProvider";
+import { Analytics } from '@vercel/analytics/next';
 
 export const metadata: Metadata = {
   title: {
@@ -70,6 +71,7 @@ export default function RootLayout({
             </ConvexClientProvider>
           </ClerkThemeProvider>
         </ThemeProvider>
+        <Analytics />
       </body>
     </html>
   );
